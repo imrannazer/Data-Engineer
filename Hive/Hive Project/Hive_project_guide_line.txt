@@ -1,0 +1,126 @@
+
+
+# install AWS command line
+		$ sudo apt-get install aws-cli
+# AWS Data Set
+		$ aws s3 ls s3://gdelt-open-data/ --no-sign-reques/events/ --no-sign-reques # publically available AWS data set
+		# Copy data form S3 to Local file system by using cp command in linux
+		$ aws s3 cp s3://gdelt-open-data/events/20181030.export.csv s3://gdelt-open-data/events/20181031.export.csv /home/hduser/Downloads/Exercises/ex_1/sol --no-sign-reques
+		$ aws s3 cp s3://gdelt-open-data/events/20181030.export.csv s3://gdelt-open-data/events/20181031.export.csv /home/hduser/Downloads/Exercises/ --no-sign-reques
+
+---- Sample Data can be downloaded from here 
+		https://registry.opendata.aws/gdelt/
+		$ aws s3 cp s3://gdelt-open-data/events/20190918.export.csv.
+--- Note: that as with most real-world BigData implementations, large datasets can be messy (corrupt/duplicate records). Please keep this in mind when you're thinking about your solution.
+
+
+************** Comment while coding what each piece of code dows.************** 
+STRING is a standard UTF-8 string
+DECIMAL is used for any numbers
+Task #1 - Generate a timeline of the events per country
+*		Load raw data in simple table
+*		It needs to be partitioned by country code
+*		Each country needs to be sorted by date
+*		June / July records should be eliminated
+*		if country code is null then "XX"
+*		if country code length is greater than 2 then "XL"
+*		When storing data in HDFS the file format should be parquet/orc
+*		calculate number of events per date
+
+
+> insert into finolOp select ...... from demo_envents;
+# Example table
+Country 		Date 		Number of events
+IN 			2015-01-01 	133
+IN 			2015-01-02 	120
+US 			2015-01-01 	1300
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

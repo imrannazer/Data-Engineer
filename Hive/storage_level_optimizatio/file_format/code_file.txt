@@ -1,0 +1,128 @@
+create table data(
+id int,
+name string,
+department string,
+country string,
+state string,
+city string)
+row format delimited
+fields terminated by ','
+stored as textFile;
+
+load data local inpath '/home/tguser/Desktop/data.csv' into table data;
+
+# Storage Information
+SerDe Library:          org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe
+InputFormat:            org.apache.hadoop.mapred.TextInputFormat
+OutputFormat:           org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
+Compressed:             No
+
+
+# -----------------------------------------------------------#
+create table orcformat(
+id int,
+name string,
+department string,
+country string,
+state string,
+city string)
+row format delimited
+fields terminated by ','
+stored as ORC;
+insert into orcformat select * from data;
+
+# Storage Information
+SerDe Library:          org.apache.hadoop.hive.ql.io.orc.OrcSerde
+InputFormat:            org.apache.hadoop.hive.ql.io.orc.OrcInputFormat
+OutputFormat:           org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat
+Compressed:             No
+
+
+# -----------------------------------------------------------#
+create table parquetformat(
+id int,
+name string,
+department string,
+country string,
+state string,
+city string)
+row format delimited
+fields terminated by ','
+stored as parquet;
+insert into parquetformat select * from data;
+
+# Storage Information
+SerDe Library:          org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe
+InputFormat:            org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat
+OutputFormat:           org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat
+Compressed:             No
+
+
+
+
+# -----------------------------------------------------------#
+create table sequencefileformat(
+id int,
+name string,
+department string,
+country string,
+state string,
+city string)
+row format delimited
+fields terminated by ','
+stored as sequencefile;
+insert into sequencefileformat select * from data;
+
+# Storage Information
+SerDe Library:          org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe
+InputFormat:            org.apache.hadoop.mapred.SequenceFileInputFormat
+OutputFormat:           org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat
+Compressed:             No
+
+
+
+# -----------------------------------------------------------#
+create table rcfileformat(
+id int,
+name string,
+department string,
+country string,
+state string,
+city string)
+row format delimited
+fields terminated by ','
+stored as rcfile;
+insert into rcfileformat select * from data;
+
+# Storage Information
+SerDe Library:          org.apache.hadoop.hive.serde2.columnar.LazyBinaryColumnarSerDe
+InputFormat:            org.apache.hadoop.hive.ql.io.RCFileInputFormat
+OutputFormat:           org.apache.hadoop.hive.ql.io.RCFileOutputFormat
+Compressed:             No
+
+
+
+
+# -----------------------------------------------------------#
+create table avroformat(
+id int,
+name string,
+department string,
+country string,
+state string,
+city string)
+row format delimited
+fields terminated by ','
+stored as avro
+TBLPROPERTIES ('header' = 'true');
+insert into avroformat select * from data;
+
+# Storage Information
+SerDe Library:          org.apache.hadoop.hive.serde2.avro.AvroSerDe
+InputFormat:            org.apache.hadoop.hive.ql.io.avro.AvroContainerInputFormat
+OutputFormat:           org.apache.hadoop.hive.ql.io.avro.AvroContainerOutputFormat
+Compressed:             No
+
+
+
+

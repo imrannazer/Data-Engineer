@@ -1,0 +1,89 @@
+1) Partition table design
+2) Bucket table design
+3) Materialized views
+===========================================================
+Storge Level Optimization :
+	1) File format: 
+			Text (csv, tsv, json, xml); 
+			binary (orc, parquet, avro) most use file format
+	2) Compression codec
+		# For Intermediate output:
+		> SET hive.exec.compress.intermediate=true
+		Deflate 	.deflate N balanced compression ratio and CPU cost.	not splittable 
+		Gzip 	.gz N compression ratio for Gzip is very high,		not splittable
+		Bzip2 	.gz Y slow for compression
+		LZ4 		.lz4 Y balance of CPU cost and compression ratio
+		LZO 	.lzo Y(with indexes)
+		Snappy 	.snappy N balance of CPU cost and compression ratio
+	
+	# for snappy
+		> SET hive.intermediate.compression.codec=
+		org.apache.hadoop.io.compress. SnappyCodec
+
+	# for gzip
+		> SET hive.intermediate.compression.codec=
+		org.apache.hadoop.io.compress.GzipCodec
+	
+	# for Bzip2
+		> SET hive.intermediate.compression.codec=
+		org.apache.hadoop.io.compress. BZip2Codec
+
+
+
+
+########CSV/TSV file:
+		create table cr_csv (cid int,cname string, revenue float).
+		ROW FORMAT delimited
+		fields terminated by ',' /* '/t' for tab /
+		STORED AS TEXTFILE;
+########JSON data
+		create table cr_json (cid int, cname string, revenue float)
+		ROW FORMAT SERDE
+		'org.apache.hive.hcatalog.data.JsonSerDe
+		STORED AS TEXTFILE ;
+########AVRO data
+		create table cr_avro_test
+		ROW FORMAT SERDE
+		'org.apache.hadoop.hive.serde2.avro. AvroSerDe'
+		STORED as INPUTFORMAT
+		'org.apache.hadoop.hive.ql.io.avro. AvroContainerInput Format
+		OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.avro. AvroContainerOutput Format
+		TBLPROPERTIES ('avro.schema.url'='hdfs:///user/hive/warehouse/testing.db/test_serializer.avsc');
+		-------- This is schema file in JSON to connect AVRO table as schema ----------
+		hive> dfs -cat /user/hive/warehouse/testing.db/test_serializer.avsc
+			{
+				"name": "cityrev",
+				"type": "record",
+				"fields": [
+					{"name":"cid", "type":"int" },
+					{ "name": "cname", "type":"string" },
+					{"name": "revenue", "type":"float" }
+						]
+			}
+
+
+
+
+
+#########ORC
+		create table cr_orc (cid int, cname string, revenue float)
+		stored as orc;
+
+#########Parquet
+		(add parquet-hive-bundle-1.9.0.jar and parquet-hadoop-bundle-1.10.0.jar)
+		create table cr_parquet (cid int, cname string, revenue float)
+		stored as parquet ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+

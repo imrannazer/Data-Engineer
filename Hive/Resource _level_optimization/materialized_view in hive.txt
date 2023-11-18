@@ -1,0 +1,118 @@
+
+1) Cost-based optimization : 
+2) Rule based optimization (Projection pushdown)
+	Hive CBO generates efficient execution plans by examining the query cost, which is collected by
+	ANALYZE statements or the metastore itself, ultimately cutting down on query execution time and reducing
+	resource utilization.
+		> SET hive.cbo.enable=true; -- default true after v0.14.0
+		> SET hive.compute.query.using.stats-true; -- default false
+		>SET hive.stats.fetch.column.stats-true; -- default false
+		> SET hive.stats.fetch.partition.stats=true; default true
+
+*****************************************************************************************
+
+Vectorized execution :
+		File format must be ORC
+		Vectorization optimization processes a larger batch of data at the same time rather than one row
+		at a time, thus significantly reducing computing overhead. 1824 Rows
+			
+		10000 Per row -> 10000
+		10000 Per batch -> 10
+		> SET hive.vectorized.execution.enabled=true; -- default false
+
+
+
+
+create materialized view by executing query on transactional tables
+materialized build on taranational table
+
+
+
+	> create materialized view <name> as query
+Drop materialized view
+	> drop materialized view <name> ;
+Refresh materialized view table
+	> ALTER MATERIALIZED VIEW [db_name. ]materialized_view_name REBUILD;
+Materialized view lifecycle
+By default, once a materialized view contents are stale, the materialized view will not be used for 
+a automatic query rewriting.
+However, in some occasions it may be fine to accept stale data, e.g., if the materialized view uses non-
+transactional tables and hence we cannot verify whether its contents are outdated, however we still want 
+to use the automatic rewriting. For those occasions, we can combine a rebuild operation run periodically, 
+e.g., every 5minutes, and define the required freshness of the materialized view data using the 
+terializedview.rewriting. time.window configuration parameter, for instance:
+	
+	Properties to set certine time to refresh materializedview table
+	> SET hive.materializedview. rewriting. time.window=10min;
+	
+
+Hive is a data warehouse database where the data is typically loaded from batch processing for analytical 
+purposes and older versions of Hive doesn't support ACID transactions on tables. Though in newer versions. 
+it supports by default ACID transactions are disabled and you need to enable it before start using it. 
+
+Hive supports full ACID semantics at the row level so that one application can add rows while another 
+reads from the same partition without interfering with each other.
+#Below are the properties you need to enable ACID transactions. 
+		SET hive.support.concurrency=true;
+		SET hive.txn.manager-org.apache.hadoop.hive.ql.lockmgr.DbTxnManager;
+
+
+# The follwoing are not required if you are using Hive 2.0
+		SET hive.enforce.bucketing-true;
+		SET hive.exec.dynamic.partition.mode=nostrict;
+
+
+# The following parameters are required for standalone hive metastore
+		SET hive.compactor.initiator.on=true; 
+		SET hive.compactor.worker.threads=1;
+
+
+Besides this, you also need to create a Transactional table by using
+		TBLPROPERTIES ('transactional'='true') at the time of creating 
+		Managed table. should use ORC format.
+
+		> create table act2(id int, mov name String, act name String, year int)
+		stored as orc
+		TBLPROPERTIES ('transactional '='true');
+
+		> insert into table act4 select * from act ;
+		
+		> insert into act4 (id, mov_name, act_name, year) values (3,"pirates", "JD", 2001), (4, "iron man", "RDJ", 2008);
+
+-- matarelizied view create actual data therefore it is not use mapreduce, and 
+-- query will also faster normal view
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

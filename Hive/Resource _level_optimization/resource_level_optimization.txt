@@ -1,0 +1,85 @@
+
+1) Cost-based optimization : 
+2) Rule based optimization (Projection pushdown)
+	Hive CBO generates efficient execution plans by examining the query cost, which is collected by
+	ANALYZE statements or the metastore itself, ultimately cutting down on query execution time and reducing
+	resource utilization.
+		> SET hive.cbo.enable=true; -- default true after v0.14.0
+		> SET hive.compute.query.using.stats-true; -- default false
+		>SET hive.stats.fetch.column.stats-true; -- default false
+		> SET hive.stats.fetch.partition.stats=true; default true
+
+*****************************************************************************************
+
+Vectorized execution :
+		File format must be ORC
+		Vectorization optimization processes a larger batch of data at the same time rather than one row
+		at a time, thus significantly reducing computing overhead. 1824 Rows
+			
+		10000 Per row -> 10000
+		10000 Per batch -> 10
+		> SET hive.vectorized.execution.enabled=true; -- default false
+
+
+
+
+create materialized view by executing query on transactional tables
+materialized build on taranational table
+	> create materialized view <name> as query
+Drop materialized view
+	> drop materialized view <name> ;
+Refresh materialized view
+	> ALTER MATERIALIZED VIEW [db_name. ]materialized_view_name REBUILD;
+Materialized view lifecycle
+By default, once a materialized view contents are stale, the materialized view will not be used for 
+a automatic query rewriting.
+However, in some occasions it may be fine to accept stale data, e.g., if the materialized view uses non-
+transactional tables and hence we cannot verify whether its contents are outdated, however we still want 
+to use the automatic rewriting. For those occasions, we can combine a rebuild operation run periodically, 
+e.g., every 5minutes, and define the required freshness of the materialized view data using the 
+terializedview.rewriting. time.window configuration parameter, for instance:
+	> SET hive.materializedview. rewriting. time.window=10min;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
