@@ -1,0 +1,319 @@
+Microsoft Windows [Version 10.0.22631.2715]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\pc>pyspark
+Python 3.10.5 (tags/v3.10.5:f377153, Jun  6 2022, 16:14:13) [MSC v.1929 64 bit (AMD64)] on win32
+Type "help", "copyright", "credits" or "license" for more information.
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+23/11/19 20:09:52 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+23/11/19 20:09:53 WARN Utils: Service 'SparkUI' could not bind on port 4040. Attempting port 4041.
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 3.3.2
+      /_/
+
+Using Python version 3.10.5 (tags/v3.10.5:f377153, Jun  6 2022 16:14:13)
+Spark context Web UI available at http://CODEDOC:4041
+Spark context available as 'sc' (master = local[*], app id = local-1700404794064).
+SparkSession available as 'spark'.
+>>> 23/11/19 20:10:04 WARN ProcfsMetricsGetter: Exception when trying to compute pagesize, as a result reporting of ProcessTree metrics is stopped
+
+>>> rdd = sc.textFile(r"D:\Big-Data-2023\Spark\SDP_exercises\data\tx_data.txt")
+>>> header = rdd.first()
+>>> result = rdd.filter(lambda x:x != header).map(lambda x:x.split(',')).map(lambda x:(int(x[0]),x[1],int(x[2])))
+>>> result.collect()
+[(1, 'R', 25), (2, 'F', 26), (3, 'T', 36), (4, 'G', 55), (5, 'F', 25), (6, 'R', 26), (7, 'G', 59), (8, 'T', 58), (9, 'F', 54), (10, 'G', 57)]
+>>> df = result.toDF()
+>>> df.show()
++---+---+---+
+| _1| _2| _3|
++---+---+---+
+|  1|  R| 25|
+|  2|  F| 26|
+|  3|  T| 36|
+|  4|  G| 55|
+|  5|  F| 25|
+|  6|  R| 26|
+|  7|  G| 59|
+|  8|  T| 58|
+|  9|  F| 54|
+| 10|  G| 57|
++---+---+---+
+
+>>> df = result.toDF(['cid', 'cname','tx_rev'])
+>>> df.show()
++---+-----+------+
+|cid|cname|tx_rev|
++---+-----+------+
+|  1|    R|    25|
+|  2|    F|    26|
+|  3|    T|    36|
+|  4|    G|    55|
+|  5|    F|    25|
+|  6|    R|    26|
+|  7|    G|    59|
+|  8|    T|    58|
+|  9|    F|    54|
+| 10|    G|    57|
++---+-----+------+
+
+>>> df = spark.read.option('inferschema', 'true').option('header','true').csv(r'D:\Big-Data-2023\Spark\SDP_exercises\data\tx_data.txt')
+>>> df.show()
++---+-----+-------+
+|cid|cname|revenue|
++---+-----+-------+
+|  1|    R|     25|
+|  2|    F|     26|
+|  3|    T|     36|
+|  4|    G|     55|
+|  5|    F|     25|
+|  6|    R|     26|
+|  7|    G|     59|
+|  8|    T|     58|
+|  9|    F|     54|
+| 10|    G|     57|
++---+-----+-------+
+
+>>> df.printSchema()
+root
+ |-- cid: integer (nullable = true)
+ |-- cname: string (nullable = true)
+ |-- revenue: integer (nullable = true)
+
+>>> df = spark.read.schema(schema).option('header','true').csv(r'D:\Big-Data-2023\Spark\SDP_exercises\data\tx_data.txt')
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'schema' is not defined
+>>>
+>>>
+>>>
+>>> schema = StructType([StructField('cid', IntegerType(), True),StructField('cname', StringType(), True),StructField('tx_rev', IntegerType(), True)])
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'StructType' is not defined
+>>>
+>>>
+>>>
+>>>
+>>>
+>>> from pyspark.sql.types import *
+>>> schema = StructType([StructField('cid', IntegerType(), True),StructField('cname', StringType(), True),StructField('tx_rev', IntegerType(), True)])
+>>> df = spark.read.schema(schema).option('header','true').csv(r'D:\Big-Data-2023\Spark\SDP_exercises\data\tx_data.txt')
+>>> df.show()
+23/11/19 21:50:39 WARN CSVHeaderChecker: CSV header does not conform to the schema.
+ Header: cid, cname, revenue
+ Schema: cid, cname, tx_rev
+Expected: tx_rev but found: revenue
+CSV file: file:///D:/Big-Data-2023/Spark/SDP_exercises/data/tx_data.txt
++---+-----+------+
+|cid|cname|tx_rev|
++---+-----+------+
+|  1|    R|    25|
+|  2|    F|    26|
+|  3|    T|    36|
+|  4|    G|    55|
+|  5|    F|    25|
+|  6|    R|    26|
+|  7|    G|    59|
+|  8|    T|    58|
+|  9|    F|    54|
+| 10|    G|    57|
++---+-----+------+
+
+>>>
+>>>
+>>>
+>>>
+>>> df.printSchema()
+root
+ |-- cid: integer (nullable = true)
+ |-- cname: string (nullable = true)
+ |-- tx_rev: integer (nullable = true)
+
+>>> schemaString = "cids integer,cnames string,tx_revs integer"
+>>> df = spark.read.option('header','true').schema(schemaString).csv(r"D:\Big-Data-2023\Spark\SDP_exercises\data\tx_data.txt")
+>>> df.show()
+23/11/19 21:56:11 WARN CSVHeaderChecker: CSV header does not conform to the schema.
+ Header: cid, cname, revenue
+ Schema: cids, cnames, tx_revs
+Expected: cids but found: cid
+CSV file: file:///D:/Big-Data-2023/Spark/SDP_exercises/data/tx_data.txt
++----+------+-------+
+|cids|cnames|tx_revs|
++----+------+-------+
+|   1|     R|     25|
+|   2|     F|     26|
+|   3|     T|     36|
+|   4|     G|     55|
+|   5|     F|     25|
+|   6|     R|     26|
+|   7|     G|     59|
+|   8|     T|     58|
+|   9|     F|     54|
+|  10|     G|     57|
++----+------+-------+
+
+>>> df.printSchema()
+root
+ |-- cids: integer (nullable = true)
+ |-- cnames: string (nullable = true)
+ |-- tx_revs: integer (nullable = true)
+
+>>>
+>>>
+>>>
+>>>
+>>>
+>>>
+>>> schemaAdd = StructType()\
+... ...  .add("cid", IntegerType(), True)\
+  File "<stdin>", line 2
+    ...  .add("cid", IntegerType(), True)\
+SyntaxError: unexpected EOF while parsing
+>>> ...  .add("cname", StringType(), True)\
+... ...  .add("tx_Add", IntegerType(), True)
+  File "<stdin>", line 2
+    ...  .add("tx_Add", IntegerType(), True)
+    ^^^
+SyntaxError: invalid syntax
+>>>
+>>>
+>>>
+>>>
+>>> schemaAdd = StructType().add("cid", IntegerType(), True).add("cname", StringType(), True).add("tx_Add", IntegerType(), True)
+>>>  df = spark.read.option("header",True).schema(schemaAdd).csv(r"D:\Big-Data-2023\Spark\SDP_exercises\data\tx_data.txt")
+  File "<stdin>", line 1
+    df = spark.read.option("header",True).schema(schemaAdd).csv(r"D:\Big-Data-2023\Spark\SDP_exercises\data\tx_data.txt")
+IndentationError: unexpected indent
+>>>
+>>>
+>>>
+>>>
+>>> schemaAdd = StructType().add("cid", IntegerType(), True).add("cname", StringType(), True).add("tx_Add", IntegerType(), True)
+>>> df = spark.read.option("header",True).schema(schemaAdd).csv(r"D:\Big-Data-2023\Spark\SDP_exercises\data\tx_data.txt")
+>>> df.show()
+23/11/19 22:09:51 WARN CSVHeaderChecker: CSV header does not conform to the schema.
+ Header: cid, cname, revenue
+ Schema: cid, cname, tx_Add
+Expected: tx_Add but found: revenue
+CSV file: file:///D:/Big-Data-2023/Spark/SDP_exercises/data/tx_data.txt
++---+-----+------+
+|cid|cname|tx_Add|
++---+-----+------+
+|  1|    R|    25|
+|  2|    F|    26|
+|  3|    T|    36|
+|  4|    G|    55|
+|  5|    F|    25|
+|  6|    R|    26|
+|  7|    G|    59|
+|  8|    T|    58|
+|  9|    F|    54|
+| 10|    G|    57|
++---+-----+------+
+
+>>> df.printSchema()
+root
+ |-- cid: integer (nullable = true)
+ |-- cname: string (nullable = true)
+ |-- tx_Add: integer (nullable = true)
+
+>>>
+>>>
+>>>
+>>>
+>>>
+>>> # read tsv file
+>>> df = spark.read.option('sep', '\t').option("header",True).option("inferschema",True).csv(r"D:\Big-Data-2023\Spark\SDP_exercises\data\movies.tsv")
+>>> df.show()
++----+-----------+---------------+----+
+|rank|      movie|          actor|year|
++----+-----------+---------------+----+
+|  12|    dhamaal|   javed jafree|2007|
+|   6|go goa gone|           saif|2013|
+|   8|   Avengers|            rdj|2008|
+|   7|      Joker|joaquin phoenix|2019|
++----+-----------+---------------+----+
+
+>>> df.printSchema()
+root
+ |-- rank: integer (nullable = true)
+ |-- movie: string (nullable = true)
+ |-- actor: string (nullable = true)
+ |-- year: integer (nullable = true)
+
+>>>
+>>>
+>>>
+>>>
+>>>
+>>>
+>>> # Read parquet File
+>>> df = spark.read.parquet(r"D:\Big-Data-2023\Spark\SDP_exercises\data\movies.parquet")
+>>> df.show()
++----+--------------------+------------------+------------+
+|rank|               movie|             actor|release_year|
++----+--------------------+------------------+------------+
+|   1|               logan|      hugh jackman|        2017|
+|   2|     The Dark Knight|      Heath ledger|        2008|
+|   3|           Wolverine|      hugh jackman|        2013|
+|   4|            Deadpool|     ryan reynolds|        2016|
+|   5|               Rocky|Sylvester Stallone|        1976|
+|   6|         go goa gone|              saif|        2013|
+|   7|               Joker|   joaquin phoenix|        2019|
+|   8|            Avengers|               rdj|        2008|
+|   9|     sherlock Holmes|               rdj|        2009|
+|  10|pirates of the ca...|       johnny depp|        2003|
+|  11|     The Expendables|sylvester stallone|        2010|
+|  12|             dhamaal|      javed jafree|        2007|
++----+--------------------+------------------+------------+
+
+>>> df.printSchema()
+root
+ |-- rank: integer (nullable = true)
+ |-- movie: string (nullable = true)
+ |-- actor: string (nullable = true)
+ |-- release_year: integer (nullable = true)
+
+>>>
+>>>
+>>>
+>>>
+>>> df = spark.read.orc(r"D:\Big-Data-2023\Spark\SDP_exercises\data\cr.orc")
+>>> df.show()
++---+----------+--------+
+|cid|     cname| revenue|
++---+----------+--------+
+|  1|aurangabad|521451.0|
+|  2|      pune| 85466.0|
+|  3|    mumbai|784854.0|
+|  4|   chennai|785455.0|
+|  5|     surat|452112.0|
+|  6|     delhi|854785.0|
+|  7| hyderabad| 84555.0|
+|  8|       xyz|  8444.0|
+|  9|       abc| 84454.0|
+| 10|       pqr|784455.0|
+| 11|       qwe|  5412.0|
+| 12|       rst| 65221.0|
+| 13|       wer|  7854.0|
+| 14|       fdr| 96584.0|
+| 15|       opr| 25487.0|
+|  1|aurangabad|521451.0|
+|  2|      pune| 85466.0|
+|  3|    mumbai|784854.0|
+|  4|   chennai|785455.0|
+|  5|     surat|452112.0|
++---+----------+--------+
+only showing top 20 rows
+
+>>> df.printSchema()
+root
+ |-- cid: integer (nullable = true)
+ |-- cname: string (nullable = true)
+ |-- revenue: float (nullable = true)
+
+>>>
